@@ -29,6 +29,7 @@ class ImageExplanation(object):
         self.intercept = {}
         self.local_exp = {}
         self.local_pred = None
+        self.queries = 0
 
     def get_image_and_mask(self, label, positive_only=True, negative_only=False, hide_rest=False,
                            num_features=5, min_weight=0.):
@@ -258,10 +259,12 @@ class LimeImageExplainer(object):
             temp[mask] = fudged_image[mask]
             imgs.append(temp)
             if len(imgs) == batch_size:
+                self.queries += len(imgs)
                 preds = classifier_fn(np.array(imgs))
                 labels.extend(preds)
                 imgs = []
         if len(imgs) > 0:
+            self.queries += len(imgs)
             preds = classifier_fn(np.array(imgs))
             labels.extend(preds)
         return data, np.array(labels)
